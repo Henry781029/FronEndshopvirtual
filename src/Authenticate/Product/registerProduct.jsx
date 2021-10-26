@@ -94,6 +94,16 @@ export default function SignUp() {
                 <TextField
                   required
                   fullWidth
+                  id="Price"
+                  label="Price $"
+                  name="Price"
+                  autoComplete="email"
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
                   name="Category"
                   label="Category"
                   id="Category"
