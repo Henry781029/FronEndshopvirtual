@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React from 'react';
+import { UseState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +13,10 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import apiBaseUrl from '../../Shared/Api';
+
+
+
 
 function Copyright(props) {
   return (
@@ -29,6 +34,11 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function loginUser() {
+  
+  const [emailValue, setEmail] = UseState("");
+  const handleEmail = e => setEmail(e.target.value.toLowerCase());
+  const [passwordValue, setPassword] = UseState("");
+  const handlePassword = e => setPassword(e.target.value);
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -38,6 +48,44 @@ export default function loginUser() {
       password: data.get('password'),
     });
   };
+
+  const submitForm = async () => {
+    function checkPassword(password) {
+      const re = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+      return re.test(password);
+    }
+    function validateEmail(email) {
+      const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return re.test(String(email).toLowerCase());
+    }
+
+    if (!validateEmail(emailValue)) {
+      console.log("The email doesn't valid")
+    } else if (!checkPassword(passwordValue)) {
+      console.log("The password must contain at least one uppercase letter, at least one special character and its length must be greater than 8 characters");
+    } else {
+      const userData = {
+        email: emailValue,
+        password: passwordValue
+      }
+      console.log(userData)
+      try {
+        const response = await fetch(`${apiBaseUrl}/login`, {
+          method: 'POST',
+          body: JSON.stringify(userData),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+        const user = await response.json();
+        console.log(user);
+      }
+      catch (e) {
+        console.log(e)
+      }
+
+    }
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -49,7 +97,7 @@ export default function loginUser() {
           sm={4}
           md={7}
           sx={{
-            backgroundImage: 'url(https://source.unsplash.com/random)',
+            backgroundImage: 'url(https://previews.123rf.com/images/jirsak/jirsak1503/jirsak150300066/37982078-empresario-haga-clic-en-el-bot%C3%B3n-virtual-e-shop-con-carrito-de-compras-el-comercio-electr%C3%B3nico-y-b2c.jpg)',
             backgroundRepeat: 'no-repeat',
             backgroundColor: (t) =>
               t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900],
@@ -79,6 +127,7 @@ export default function loginUser() {
                 required
                 fullWidth
                 id="email"
+                onChange= {handleEmail}
                 label="Email Address"
                 name="email"
                 autoComplete="email"
@@ -89,6 +138,7 @@ export default function loginUser() {
                 required
                 fullWidth
                 name="password"
+                onChange= {handlePassword}
                 label="Password"
                 type="password"
                 id="password"
@@ -102,9 +152,20 @@ export default function loginUser() {
                 type="submit"
                 fullWidth
                 variant="contained"
+                color="secondary"
                 sx={{ mt: 3, mb: 2 }}
+                onClick={submitForm}
               >
                 Sign In
+              </Button>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="success"
+                sx={{ mt: 1, mb: 2 }}
+              >
+                Register
               </Button>
               <Grid container>
                 <Grid item xs>
